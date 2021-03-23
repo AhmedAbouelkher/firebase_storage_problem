@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "255814583967",
+    "firebase_url": "https://flash-chat-f730d.firebaseio.com",
+    "project_id": "flash-chat-f730d",
+    "storage_bucket": "flash-chat-f730d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:255814583967:android:e3941864a19ab6d9c204aa",
+        "android_client_info": {
+          "package_name": "com.example.firebase_storage_problem"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "255814583967-i4gl96peh83r5k386a8qihkglmlreljb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDXUt_u4C6vXBqHldnN_sqau2EpFi0RHg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "255814583967-i4gl96peh83r5k386a8qihkglmlreljb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "255814583967-39b7qo8ti9j40fv6b0nfohjohfakg7nf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.firebaseStorageProblem"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

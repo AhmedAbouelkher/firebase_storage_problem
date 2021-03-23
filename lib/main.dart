@@ -1,7 +1,9 @@
 // @dart=2.9
 
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io' as io;
+import 'dart:math' hide log;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -73,8 +75,9 @@ class _TaskManager extends State<TaskManager> {
     firebase_storage.UploadTask uploadTask;
 
     // Create a Reference to the file
+    final _randomID = Random().nextInt(9999);
     firebase_storage.Reference ref =
-        firebase_storage.FirebaseStorage.instance.ref().child('playground').child('/some-image.jpg');
+        firebase_storage.FirebaseStorage.instance.ref().child('playground').child('/some-image$_randomID.jpg');
 
     final metadata = firebase_storage.SettableMetadata(
       contentType: 'image/jpeg',
@@ -116,15 +119,11 @@ class _TaskManager extends State<TaskManager> {
         PickedFile file = await ImagePicker().getImage(source: ImageSource.gallery);
         firebase_storage.UploadTask task = await uploadFile(file);
         if (task != null) {
-          setState(() {
-            _uploadTasks = [..._uploadTasks, task];
-          });
+          setState(() => _uploadTasks = [..._uploadTasks, task]);
         }
         break;
       case UploadType.clear:
-        setState(() {
-          _uploadTasks = [];
-        });
+        setState(() => _uploadTasks = []);
         break;
     }
   }
@@ -226,7 +225,7 @@ class _TaskManager extends State<TaskManager> {
 }
 
 /// Displays the current state of a single UploadTask.
-class UploadTaskListTile extends StatelessWidget {
+class UploadTaskListTile extends StatefulWidget {
   // ignore: public_member_api_docs
   const UploadTaskListTile({
     Key key,
@@ -248,15 +247,28 @@ class UploadTaskListTile extends StatelessWidget {
   /// Triggered when the user presses the "link" button on a completed upload task.
   final VoidCallback /*!*/ onDownloadLink;
 
+  @override
+  _UploadTaskListTileState createState() => _UploadTaskListTileState();
+}
+
+class _UploadTaskListTileState extends State<UploadTaskListTile> {
   /// Displays the current transferred bytes of the task.
   String _bytesTransferred(firebase_storage.TaskSnapshot snapshot) {
     return '${snapshot.bytesTransferred}/${snapshot.totalBytes}';
   }
 
   @override
+  void initState() {
+    widget.task.snapshotEvents.listen((event) {
+      log(event.toString());
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return StreamBuilder<firebase_storage.TaskSnapshot>(
-      stream: task.snapshotEvents,
+      stream: widget.task.snapshotEvents,
       builder: (BuildContext context, AsyncSnapshot<firebase_storage.TaskSnapshot> asyncSnapshot) {
         Widget subtitle = const Text('---');
         firebase_storage.TaskSnapshot snapshot = asyncSnapshot.data;
@@ -276,10 +288,10 @@ class UploadTaskListTile extends StatelessWidget {
         }
 
         return Dismissible(
-          key: Key(task.hashCode.toString()),
-          onDismissed: ($) => onDismissed(),
+          key: Key(widget.task.hashCode.toString()),
+          onDismissed: ($) => widget.onDismissed(),
           child: ListTile(
-            title: Text('Upload Task #${task.hashCode}'),
+            title: Text('Upload Task #${widget.task.hashCode}'),
             subtitle: subtitle,
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
@@ -287,27 +299,27 @@ class UploadTaskListTile extends StatelessWidget {
                 if (state == firebase_storage.TaskState.running)
                   IconButton(
                     icon: const Icon(Icons.pause),
-                    onPressed: task.pause,
+                    onPressed: widget.task.pause,
                   ),
                 if (state == firebase_storage.TaskState.running)
                   IconButton(
                     icon: const Icon(Icons.cancel),
-                    onPressed: task.cancel,
+                    onPressed: widget.task.cancel,
                   ),
                 if (state == firebase_storage.TaskState.paused)
                   IconButton(
                     icon: const Icon(Icons.file_upload),
-                    onPressed: task.resume,
+                    onPressed: widget.task.resume,
                   ),
                 if (state == firebase_storage.TaskState.success)
                   IconButton(
                     icon: const Icon(Icons.file_download),
-                    onPressed: onDownload,
+                    onPressed: widget.onDownload,
                   ),
                 if (state == firebase_storage.TaskState.success)
                   IconButton(
                     icon: const Icon(Icons.link),
-                    onPressed: onDownloadLink,
+                    onPressed: widget.onDownloadLink,
                   ),
               ],
             ),
